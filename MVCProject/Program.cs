@@ -27,7 +27,7 @@ namespace MVCProject
             builder.Services.AddScoped<IScheduleRepo, ScheduleRepo>();
             builder.Services.AddScoped<IIntakeRepo, IntakeRepo>();
             builder.Services.AddScoped<IAttendanceRecordRepo, AttendanceRecordRepo>();
-
+            builder.Services.AddScoped<IDepartmentRepo, DepartmentRepo>();
 
             builder.Services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
             {
@@ -53,7 +53,9 @@ namespace MVCProject
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+                //pattern: "{controller=Employee}/{action=Index}/{id?}");
 
+            app.MapControllers();
             app.Run();
         }
     }

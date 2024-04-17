@@ -17,6 +17,7 @@ namespace MVCProject.Models
 
         [Required]
         [EmailAddress]
+        [Remote("IsEmailAvailable", "Student",ErrorMessage = "Email is already in use")]
         public string Email { get; set; }
 
         [Required]

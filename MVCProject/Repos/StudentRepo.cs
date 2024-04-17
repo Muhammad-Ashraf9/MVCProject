@@ -32,7 +32,7 @@ namespace MVCProject.Repos
 
         public bool DeleteStudent(int id);
 
-        public bool AddStudentsFromExcel(List<Student> student);
+        public void AddRangeOfStudents(List<Student> student);
 
         public int GetInstructorIdByStudentId(int id);
 
@@ -41,6 +41,8 @@ namespace MVCProject.Repos
         public IEnumerable<DailyAttendanceRecord> GetDailyAttendanceRecordsByStudentId(int id,int numberOfDays,DateOnly startDate);
 
         public List<Student> GetTrackStudents(int trackId);
+
+        public bool IsEmailInUse(string email);
 
     }
 
@@ -61,6 +63,8 @@ namespace MVCProject.Repos
         }
         public void RegisterStudent(Student std)
         {
+            std.Email = std.Email.Trim().ToLower();
+            std.Password = std.Password.Trim();
             db.Students.Add(std);
             db.SaveChanges();
             if (std.Id == 0)
@@ -196,8 +200,8 @@ namespace MVCProject.Repos
             {
 
             var supervisorId = db.StudentIntakeTracks.Include(sit => sit.Track).FirstOrDefault(sit => sit.StdID == id).Track
-                .SupervisorID;
-            return supervisorId;
+                .SupervisorForeignKeyID;
+            return (int)supervisorId;
             }
             catch (Exception e)
             {
@@ -225,9 +229,10 @@ namespace MVCProject.Repos
             return db.DailyAttendanceRecords.Where(d => d.StdID == id && d.Date <= startDate).OrderByDescending(d=>d.Date).Take(numberOfDays);
         }
 
-        bool IStudentRepo.AddStudentsFromExcel(List<Student> student)
+        public void AddRangeOfStudents(List<Student> student)
         {
-            throw new NotImplementedException();
+            db.Students.AddRange(student);
+            db.SaveChanges();
         }
 
         public List<Student> GetTrackStudents(int trackId)
@@ -238,6 +243,11 @@ namespace MVCProject.Repos
                             .Include(s=>s.StudentIntakeTracks)
                             .Where(s=>s.StudentIntakeTracks.Any(sit=>sit.TrackID==trackId))
                             .ToList();
+        }
+
+        public bool IsEmailInUse(string email)
+        {
+            return db.Students.Any(s => s.Email == email.Trim().ToLower());
         }
     }
 }
